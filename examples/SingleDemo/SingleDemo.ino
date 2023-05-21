@@ -3,7 +3,7 @@
 // Serial port on which the Dobot will be connected
 HardwareSerialWrapper dobotSerial{&Serial1};
 // Instantiate a Dobot instance of ID 0 that uses Serial 1
-DobotInstance dobot{dobotSerial, 0};
+DobotInstance dobot{&dobotSerial, 0};
 
 void Dobot_Callback(uint8_t dobotId, Message* msg)
 {
@@ -45,7 +45,7 @@ void loop()
 		// Param 0 = false => Dobot is occupied
 		dobot.SetParam(0, false);
 	}
-	DobotNet::Tick(cb)
+	DobotNet::Tick(cb);
 	// Wait 100 ms
 	delay(100);
 }

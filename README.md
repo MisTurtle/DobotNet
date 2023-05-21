@@ -33,7 +33,7 @@ The following program controls one *Dobot Magician* device whose TX and RX commu
 // Serial port on which the Dobot will be connected
 HardwareSerialWrapper dobotSerial{&Serial1};
 // Instantiate a Dobot instance of ID 0 that uses Serial 1
-DobotInstance dobot{dobotSerial, 0};
+DobotInstance dobot{&dobotSerial, 0};
 
 void Dobot_Callback(uint8_t dobotId, Message* msg)
 {
@@ -75,7 +75,7 @@ void loop()
 		// Param 0 = false => Dobot is occupied
 		dobot.SetParam(0, false);
 	}
-	DobotNet::Tick(cb)
+	DobotNet::Tick(cb);
 	// Wait 100 ms
 	delay(100);
 }
@@ -96,7 +96,7 @@ HardwareSerialWrapper dobotS1{&Serial1};
 SoftwareSerialWrapper dobotS2{&Serial5};
 
 // Instantiate two Dobot instances
-DobotInstance dobots[2] = {{dobotS1, 0}, {dobotS2, 1}};
+DobotInstance dobots[2] = {{&dobotS1, 0}, {&dobotS2, 1}};
 
 void Dobot_Callback(uint8_t dobotId, Message* msg)
 {
@@ -116,7 +116,7 @@ void setup()
 void loop()
 {
 	for(auto & dobot: dobots)
-	{ // Loop through each dobot instance
+	{
 		if(dobot.GetParam(0))
 		{
 			// Toggle param 1 to know whether to move to x = 200 or x = 300
@@ -142,7 +142,6 @@ void loop()
 	// Wait 100 ms
 	delay(100);
 }
-
 ```
 
 ## Project Repository

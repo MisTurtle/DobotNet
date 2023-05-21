@@ -8,7 +8,7 @@ HardwareSerialWrapper dobotS1{&Serial1};
 SoftwareSerialWrapper dobotS2{&Serial5};
 
 // Instantiate two Dobot instances
-DobotInstance dobots[2] = {{dobotS1, 0}, {dobotS2, 1}};
+DobotInstance dobots[2] = {{&dobotS1, 0}, {&dobotS2, 1}};
 
 void Dobot_Callback(uint8_t dobotId, Message* msg)
 {
