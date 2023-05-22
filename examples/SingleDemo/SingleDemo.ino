@@ -4,48 +4,39 @@
 HardwareSerialWrapper dobotSerial{&Serial1};
 // Instantiate a Dobot instance of ID 0 that uses Serial 1
 DobotInstance dobot{&dobotSerial, 0};
-
-void Dobot_Callback(uint8_t dobotId, Message* msg)
-{
-	// Called when the dobot sends a response packet via the RX port
-	if(msg->id == ProtocolPTPCmd)
-		DobotNet::GetDobot(dobotId)->SetParam(0, true);
-}
-
-DobotResponseCallback cb[1] = {Dobot_Callback};
+// Loop count
+int count = 0;
 
 void setup()
 {
+  Serial.begin(9600);
 	// Initialize the dobot network with 1 dobot
 	DobotNet::Init(&dobot, 1);
-	// Keep track of the dobot's movements state using param 0
-	// Param 0 = true => Dobot is free to move
-	dobot.SetParam(0, true);
+  // Send movement speed and acceleration parameters to the dobot
+  send_movement_parameters();
+}
+
+void send_movement_parameters()
+{
+  dobot.SetPTPCoordinateParams(100, 100, 80, 80, true); // XYZ moving speed
+	dobot.SetPTPCommonParams(50, 50, true); // Ratios
+
+  DobotNet::Tick(nullptr);
 }
 
 void loop()
 {
-	if(dobot.GetParam(0))
-	{
-		// Toggle param 1 to know whether to move to x = 200 or x = 300
-		dobot.SetParam(1, !dobot.GetParam(1));
+  float x;
+  
+  if(count++ % 2) x = 200;
+  else x = 300;
 
-		float x;
-		if(dobot.GetParam(1)) x = 200;
-		else x = 300;
+  // Move to a given point using the linear moving mode
+  dobot.MoveTo(MOVL_XYZ, x, 0, 50, 0);
 
-		// Call on the DobotInstance::MoveTo(mode, x, y, z, r) function
-		dobot.MoveTo(
-				MOVL_XYZ, // Movement mode
-				x, // x coordinate
-				0, // y coordinate
-				50, // z coordinate
-				0 // r end-effector rotation
-		);
-		// Param 0 = false => Dobot is occupied
-		dobot.SetParam(0, false);
-	}
-	DobotNet::Tick(cb);
-	// Wait 100 ms
-	delay(100);
+  // Send all previously requested packets
+	DobotNet::Tick(nullptr);
+
+	// Wait 3 seconds
+	delay(3000);
 }
