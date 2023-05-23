@@ -230,6 +230,22 @@ void DobotInstance::DoHomeProcedure(bool isQueued)
 
 	);
 }
+
+// Alarm
+void DobotInstance::ClearAlarmState()
+{
+	CreateMessageAndSendAction(
+			this->GetProtocolHandler(),
+			ProtocolFunctionALARMBase + 1,
+			false,
+			nullptr,
+			0
+	);
+}
+void DobotInstance::ClearAlarm()
+{
+	this->ClearAlarmState();
+}
 // END : PROTOCOL //
 
 // DOBOT ARDUINO PARAMETERS //

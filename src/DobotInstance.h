@@ -55,6 +55,10 @@ public:
 	// Home
 	void SetHomeParams(float x, float y, float z, float r, bool isQueued);
 	void DoHomeProcedure(bool isQueued);
+
+	// Alarm
+	void ClearAlarmState();
+	void ClearAlarm();
 	// END: DOBOT ACTIONS //
 
 	// DOBOT ARDUINO PARAMETERS //

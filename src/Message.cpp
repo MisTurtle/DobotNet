@@ -123,7 +123,7 @@ void MessageFillAction(Message* msg, uint8_t pid, bool isQueued, const void* src
 	msg->rw = true;
 	msg->isQueued = isQueued;
 	msg->paramsLen = size;
-	memcpy(msg->params, src, size);
+	if(size != 0 and src != nullptr) memcpy(msg->params, src, size);
 }
 
 /*********************************************************************************************************
