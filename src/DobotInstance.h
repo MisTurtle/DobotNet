@@ -59,6 +59,9 @@ public:
 	// Alarm
 	void ClearAlarmState();
 	void ClearAlarm();
+
+	// Delay
+	void Delay(uint32_t timeout, bool isQueued);
 	// END: DOBOT ACTIONS //
 
 	// DOBOT ARDUINO PARAMETERS //

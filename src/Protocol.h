@@ -155,6 +155,10 @@ typedef struct tagPose {
 	float jointAngle[4];
 } Pose;
 
+typedef struct tagWaitCMD {
+	uint32_t timeout;
+} WAITCmd;
+
 typedef void(*DobotResponseCallback)(uint8_t, Message*);
 
 extern void ProtocolInit(ProtocolHandler* handler);

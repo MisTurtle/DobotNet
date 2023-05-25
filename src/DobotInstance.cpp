@@ -231,6 +231,18 @@ void DobotInstance::DoHomeProcedure(bool isQueued)
 	);
 }
 
+void DobotInstance::Delay(uint32_t timeout, bool isQueued)
+{
+	WAITCmd cmd{timeout};
+	CreateMessageAndSendAction(
+			this->GetProtocolHandler(),
+			ProtocolWAITCmd,
+			isQueued,
+			(uint8_t *) &cmd,
+			sizeof(WAITCmd)
+		);
+}
+
 // Alarm
 void DobotInstance::ClearAlarmState()
 {
