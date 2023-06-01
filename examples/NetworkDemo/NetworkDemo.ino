@@ -29,22 +29,18 @@ void send_movement_parameters()
 		dobot.SetPTPCoordinateParams(100, 100, 80, 80, true); // XYZ moving speed
 		dobot.SetPTPCommonParams(50, 50, true); // Ratios
 	}
-
+	// Submit movement packets, without callback to be performed
 	DobotNet::Tick(nullptr);
 }
 
 void loop()
 {
 	float x;
-
 	if(count++ % 2) x = 200;
 	else x = 300;
 
 	// Move to a given point using the linear moving mode
-	for(auto & dobot: dobots)
-	{
-		dobot.MoveTo(MOVL_XYZ, x, 0, 50, 0);
-	}
+	for(auto & dobot: dobots) dobot.MoveTo(MOVL_XYZ, x, 0, 50, 0);
 
 	// Send all previously requested packets
 	DobotNet::Tick(nullptr);

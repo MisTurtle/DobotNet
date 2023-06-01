@@ -136,4 +136,4 @@ void loop()
 
 ## Project Repository
 
-To take a look at the final repository for our project (Python, C++), [click here](https://github.com/) (Coming soon...)
+To take a look at the final repository for our project (Python, C++), [click here](https://github.com/MisTurtle/DobotCityBuilding)
