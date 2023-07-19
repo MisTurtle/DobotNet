@@ -64,13 +64,13 @@ void loop()
 	// Move to a given point using the linear moving mode
 	dobot.MoveTo(MOVL_XYZ, x, 0, 50, 0);
 
-	// Send all previously requested packets
+	// Flush all packets to every dobot connected to the board (here, one dobot)
+	// `nullptr` indicates that no callback function needs to be performed when receiving the dobot's answer
 	DobotNet::Tick(nullptr);
 
 	// Wait 3 seconds
 	delay(3000);
 }
-
 ```
 
 ### 2. Control two or more dobot instances with *DobotNet*
@@ -96,7 +96,7 @@ int count = 0;
 void setup()
 {
 	Serial.begin(9600);
-	// Initialize the dobot network with 1 dobot
+	// Initialize the dobot network with 2 dobots
 	DobotNet::Init(dobots, 2);
 	// Send movement speed and acceleration parameters to the dobot
 	send_movement_parameters();
@@ -121,12 +121,10 @@ void loop()
 	else x = 300;
 
 	// Move to a given point using the linear moving mode
-	for(auto & dobot: dobots)
-	{
-		dobot.MoveTo(MOVL_XYZ, x, 0, 50, 0);
-	}
+	for(auto & dobot: dobots) dobot.MoveTo(MOVL_XYZ, x, 0, 50, 0);
 
-	// Send all previously requested packets
+	// Flush all packets to every dobot connected to the board (here, two dobots)
+	// `nullptr` indicates that no callback function needs to be performed when receiving a dobot's answer
 	DobotNet::Tick(nullptr);
 
 	// Wait 3 seconds
@@ -134,6 +132,76 @@ void loop()
 }
 ```
 
-## Project Repository
+### 3. Using callbacks
 
-To take a look at the final repository for our project (Python, C++), [click here](https://github.com/MisTurtle/DobotCityBuilding)
+In the context of this library, callbacks can be used to retrieve and treat informations provided by a dobot instance.
+Whether it is to check if a dobot is still connected, to get its position, its alarm state etc..., callbacks are the way to go here.
+
+The following example will make the two dobots move only if they are both connected. If at any point a dobot gets disconnected from the board, the move action will not be sent.
+
+```cpp
+#include "DobotNet.h"
+#include <SoftwareSerial.h>
+
+// Emulate Serial port on pins RX: 12 and TX: 13
+SoftwareSerial Serial5{12, 13};
+// Serial ports on which the Dobots will be connected
+HardwareSerialWrapper dobotS1{&Serial1};
+SoftwareSerialWrapper dobotS2{&Serial5};
+
+// Instantiate two Dobot instances
+DobotInstance dobots[2] = {{&dobotS1, 0}, {&dobotS2, 1}};
+
+// Loop count
+int loopCount = 0;
+// Connected dobot count
+int connectedDobots = 0;
+
+
+void HandleDobotRx(uint8_t dobotId, Message* msg)
+{ // Called when a response is received from a dobot
+	if(msg->id == ProtocolGetPose) ++connectedDobots;
+}
+// List containing callback functions for each dobot
+// Can be different for each dobot
+DobotResponseCallback callbacks[2] = {HandleDobotRx, HandleDobotRx};
+
+void setup()
+{
+	Serial.begin(9600);
+	// Initialize the dobot network with 2 dobots
+	DobotNet::Init(dobots, 2);
+}
+
+void SendMovePacket()
+{
+	float x;
+
+	if(loopCount++ % 2) x = 200;
+	else x = 300;
+
+	// Move to a given point using the linear moving mode
+	for(auto & dobot: dobots) dobot.MoveTo(MOVL_XYZ, x, 0, 50, 0);
+}
+
+void loop()
+{
+	if(connectedDobots == 2) SendMovePacket();
+
+	connectedDobots = 0;
+	// Send a packet to check if both dobots respond upon receiving it
+	for(auto & dobot: dobots) dobot.SendGetterProtocol(ProtocolGetPose, true);
+
+	// Flush all packets to every dobot connected to the board (here, two dobots)
+	// If both dobots are connected, both the Move packet and GetPose packet will be sent
+	// Otherwise, only the GetPose packet will be passed
+	DobotNet::Tick(callbacks);
+
+	// Wait 3 seconds
+	delay(3000);
+}
+```
+
+## Example Project Repository
+
+To take a look at the final repository for a project made using this library (Python, C++), [click here](https://github.com/MisTurtle/DobotCityBuilding)

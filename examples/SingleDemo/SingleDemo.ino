@@ -34,7 +34,8 @@ void loop()
 	// Move to a given point using the linear moving mode
 	dobot.MoveTo(MOVL_XYZ, x, 0, 50, 0);
 
-	// Send all previously requested packets
+	// Flush all packets to every dobot connected to the board (here, one dobot)
+	// `nullptr` indicates that no callback function needs to be performed when receiving the dobot's answer
 	DobotNet::Tick(nullptr);
 
 	// Wait 3 seconds
